@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.4"
+png = "0.17.5"
+cairo-rs = { version = "0.9.1", features = ["png"] }
