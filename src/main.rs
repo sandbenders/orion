@@ -1,5 +1,4 @@
 // a3 size in pixels at 300 DPI: 3508 x 4960
-#[allow(dead_code, unused)] // remove that later
 extern crate cairo;
 
 use rand::{thread_rng, Rng};
@@ -62,7 +61,7 @@ fn draw_lines(points: &Vec<Points>) {
 
     filename.push_str(".png");
 
-    dbg!(&filename);
+    println!("Generating {}", &filename);
 
     let mut file = File::create(&filename)
         .expect("Couldn't create file");
