@@ -1,7 +1,8 @@
 #[allow(dead_code, unused)] // remove that later
 extern crate cairo;
 
-use rand::Rng;
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
 
 use cairo::{ Context, Format, ImageSurface };
 
@@ -9,12 +10,12 @@ use std::fs::File;
 
 #[derive(Debug)]
 struct Points {
-    pos_x: u16, // unsigned (0/+) max 65535
-    pos_y: u16,
+    pos_x: f64,
+    pos_y: f64,
 }
 
 fn generate_points() -> Vec<Points> {
-    let mut rng = rand::thread_rng();
+    let mut rng = thread_rng();
     let number_points = rng.gen_range(5..10);
 
     let mut vec_points: Vec<Points> = Vec::new();
@@ -23,8 +24,8 @@ fn generate_points() -> Vec<Points> {
     while x < number_points {
         x += 1;
         let new_point = Points {
-            pos_x: rng.gen_range(0..297),
-            pos_y: rng.gen_range(0..420),
+            pos_x: rng.gen_range(0.0..297.0),
+            pos_y: rng.gen_range(0.0..420.0),
         };
         vec_points.push(new_point);
     }
@@ -33,16 +34,37 @@ fn generate_points() -> Vec<Points> {
 }
 
 fn draw_lines(points: &Vec<Points>) {
-    dbg!(&points);
     let surface = ImageSurface::create(Format::ARgb32, 297, 420)
         .expect("Couldn't create a surface!");
     let context = Context::new(&surface);
 
-    let mut rng = rand::thread_rng();
+    let mut rng = thread_rng();
     context.set_source_rgb(rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0));
     context.paint();
 
-    let mut file = File::create("output.png")
+    for point in points.iter() {
+        context.move_to(point.pos_x, point.pos_y);
+        for new_points in points.iter() {
+            context.line_to(new_points.pos_x, new_points.pos_y);
+        }
+        context.close_path();
+
+
+        context.set_source_rgba(rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0));
+        context.fill_preserve();
+    }
+
+    let mut filename: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(20)
+        .map(char::from)
+        .collect();
+
+    filename.push_str(".png");
+
+    dbg!(&filename);
+
+    let mut file = File::create(&filename)
         .expect("Couldn't create file");
     surface.write_to_png(&mut file)
         .expect("Couldn't write to png");
