@@ -1,3 +1,4 @@
+// a3 size in pixels at 300 DPI: 3508 x 4960
 #[allow(dead_code, unused)] // remove that later
 extern crate cairo;
 
@@ -16,7 +17,7 @@ struct Points {
 
 fn generate_points() -> Vec<Points> {
     let mut rng = thread_rng();
-    let number_points = rng.gen_range(5..10);
+    let number_points = rng.gen_range(5..15);
 
     let mut vec_points: Vec<Points> = Vec::new();
 
@@ -24,8 +25,8 @@ fn generate_points() -> Vec<Points> {
     while x < number_points {
         x += 1;
         let new_point = Points {
-            pos_x: rng.gen_range(0.0..297.0),
-            pos_y: rng.gen_range(0.0..420.0),
+            pos_x: rng.gen_range(0.0..3508.0),
+            pos_y: rng.gen_range(0.0..4960.0),
         };
         vec_points.push(new_point);
     }
@@ -34,7 +35,7 @@ fn generate_points() -> Vec<Points> {
 }
 
 fn draw_lines(points: &Vec<Points>) {
-    let surface = ImageSurface::create(Format::ARgb32, 297, 420)
+    let surface = ImageSurface::create(Format::ARgb32, 3508, 4960)
         .expect("Couldn't create a surface!");
     let context = Context::new(&surface);
 
@@ -48,7 +49,6 @@ fn draw_lines(points: &Vec<Points>) {
             context.line_to(new_points.pos_x, new_points.pos_y);
         }
         context.close_path();
-
 
         context.set_source_rgba(rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0));
         context.fill_preserve();
@@ -71,6 +71,9 @@ fn draw_lines(points: &Vec<Points>) {
 }
 
 fn main() {
-    let points = generate_points();
-    draw_lines(&points);
+    // generate 10 images at time
+    for _ in 0..10 {
+        let points = generate_points();
+        draw_lines(&points);
+    }
 }
